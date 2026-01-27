@@ -26,3 +26,5 @@
 
 **Jan 27, 2026 - 17:15**
 > * Separate logic branch for failed requests.
+> * Moved the HTTP client out of the for loop and used & to reference it avoiding copying.
+> * Closed the response at the end of the loop.
