@@ -21,3 +21,8 @@
 > * Returned home and picked up where I left off.
 > * Created a repository on Github and uploaded this project.
 > * Minor fix to the README.
+> * Created an HTTP client with the net package.
+> * Imported the time package to set the clients timeout to 5 seconds.
+
+**Jan 27, 2026 - 17:15**
+> * Separate logic branch for failed requests.
