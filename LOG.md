@@ -28,3 +28,9 @@
 > * Separate logic branch for failed requests.
 > * Moved the HTTP client out of the for loop and used & to reference it avoiding copying.
 > * Closed the response at the end of the loop.
+
+**Jan 27, 2026 - 17:30**
+> * Moved the logic into a separate function.
+> * Discovered defer, learned it will be useful for when I introduce concurrency.
+> * Used defer resp.Body.Close() after the error check to avoid trying to close a non-existent response.
+> * Used ANSI colour codes to colour the status code green when it is 200.
