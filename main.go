@@ -10,17 +10,20 @@ import (
 )
 
 func main() {
+	// Creates a slice of the arguments containing the URLs
+	urls := os.Args[1:]
+
 	// Creates an HTTP client with a 5-second timeout.
 	client := &http.Client{Timeout: 5 * time.Second}
 
 	// Creates a WaitGroup to manage goroutines.
 	var wg sync.WaitGroup
 
-	// Creates a channel to collect Results.
-	results := make(chan Result)
+	// Creates a buffered channel to collect Results.
+	results := make(chan Result, len(urls))
 
 	// Loops through all URLs provided.
-	for _, url := range os.Args[1:] {
+	for _, url := range urls {
 		// Increments the WaitGroup counter.
 		wg.Add(1)
 
@@ -33,14 +36,12 @@ func main() {
 		}()
 	}
 
-	// Blocks until all goroutines return.
+	// Blocks until all goroutines return and closes write access to the channel.
 	wg.Wait()
+	close(results)
 
 	// Outputs the results.
-	fmt.Printf("%v", results)
-
-	// Closes the channel once we have finished using it.
-	close(results)
+	printResults(results)
 }
 
 type Result struct {
@@ -57,7 +58,8 @@ func checkURL(url string, client *http.Client) Result {
 	}
 
 	// Sends a request and prints the response.
-	resp, err := client.Get(url)
+	// Uses Head() over Get() as we have no need for the request body.
+	resp, err := client.Head(url)
 
 	// Prints the error if we failed to recieve a response.
 	if err != nil {
@@ -71,4 +73,33 @@ func checkURL(url string, client *http.Client) Result {
 
 	// Returns the Result
 	return Result{url: url, isLive: true, statusCode: statusCode}
+}
+
+func printResults(results chan Result) {
+	const (
+		Up   = "\033[1;32mUP\033[0m"
+		Down = "\033[1;31mDOWN\033[0m"
+	)
+
+	for result := range results {
+		if result.isLive {
+			fmt.Printf("%-20s | %s   | %d\n", result.url, Up, result.statusCode)
+		} else {
+			err := translateError(result.err)
+			fmt.Printf("%-20s | %s | %v\n", result.url, Down, err)
+		}
+	}
+}
+
+func translateError(err error) string {
+	msg := err.Error()
+
+	switch {
+	case strings.Contains(msg, "refused"):
+		return "CONNECTION REFUSED"
+	case strings.Contains(msg, "no such host"):
+		return "NO SUCH HOST"
+	default:
+		return msg
+	}
 }

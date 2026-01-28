@@ -58,3 +58,18 @@
 > * Learnt about channels.
 > * Made a channel to collect Results from goroutines.
 > * Encountered an issue where main() never terminates.
+
+**Jan 28, 2026 - 20:00**
+> * Discovered that the goroutines were blocking.
+> * Learnt about buffered vs unbuffered channels.
+> * Implemented a buffered channel instead to solve the issue.
+> * Learnt that closing channels only removes write access.
+> * Moved close(results) to just after the goroutines.
+
+**Jan 28, 2026 - 20:15**
+> * Started writing a function dedicated to printing the results.
+> * Discovered that as channels are streams they are not indexed.
+> * Added UP and DOWN status to the output coloured with ANSI escape codes.
+
+**Jan 28, 2026 - 21:00**
+> * Added rudimentary checks to shorten common error messages
