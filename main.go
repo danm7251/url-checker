@@ -16,19 +16,24 @@ func main() {
 	// Creates a WaitGroup to manage goroutines.
 	wg := new(sync.WaitGroup)
 
+	// Loops through all URLs provided.
 	for _, url := range os.Args[1:] {
+		// Increments the WaitGroup counter.
 		wg.Add(1)
-		go checkURL(url, client, wg)
+
+		// An anonymous goroutine that runs checkURL()
+		// and decrements the WaitGroup counter when it returns.
+		go func() {
+			defer wg.Done()
+			checkURL(url, client)
+		}()
 	}
 
 	// Blocks until all goroutines return.
 	wg.Wait()
 }
 
-func checkURL(url string, client *http.Client, wg *sync.WaitGroup) {
-	// Decrements the WaitGroup counter once the function returns.
-	defer wg.Done()
-
+func checkURL(url string, client *http.Client) {
 	// ANSI Colour codes
 	const (
 		ColourGreen = "\033[1;92m"
