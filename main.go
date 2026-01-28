@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -12,12 +13,22 @@ func main() {
 	// Creates an HTTP client with a 5-second timeout.
 	client := &http.Client{Timeout: 5 * time.Second}
 
+	// Creates a WaitGroup to manage goroutines.
+	wg := new(sync.WaitGroup)
+
 	for _, url := range os.Args[1:] {
-		checkURL(url, client)
+		wg.Add(1)
+		go checkURL(url, client, wg)
 	}
+
+	// Blocks until all goroutines return.
+	wg.Wait()
 }
 
-func checkURL(url string, client *http.Client) {
+func checkURL(url string, client *http.Client, wg *sync.WaitGroup) {
+	// Decrements the WaitGroup counter once the function returns.
+	defer wg.Done()
+
 	// ANSI Colour codes
 	const (
 		ColourGreen = "\033[1;92m"

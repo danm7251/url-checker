@@ -34,3 +34,13 @@
 > * Discovered defer, learned it will be useful for when I introduce concurrency.
 > * Used defer resp.Body.Close() after the error check to avoid trying to close a non-existent response.
 > * Used ANSI colour codes to colour the status code green when it is 200.
+
+**Jan 28, 2026 - 17:00**
+> * Had a slight setback where my Laptop broke yesterday evening. It is now up and running.
+> * Tried using the go keyword to check URLs concurrently.
+> * Realised they weren't printing output as the main function was terminating the program before they could finish.
+> * Used time.Sleep() however it's clearly not the answer since the program waits even after the URLs are checked.
+> * Learning about sync.WaitGroup to block execution until all goroutines return.
+
+**Jan 28, 2026 - 17:15**
+> * Implemented a WaitGroup and now my URL checks are concurrent!
