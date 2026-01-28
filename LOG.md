@@ -72,4 +72,5 @@
 > * Added UP and DOWN status to the output coloured with ANSI escape codes.
 
 **Jan 28, 2026 - 21:00**
-> * Added rudimentary checks to shorten common error messages
+> * Added rudimentary checks to shorten common error messages.
+> * Used dynamic padding to neaten the display.

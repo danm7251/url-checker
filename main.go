@@ -13,6 +13,14 @@ func main() {
 	// Creates a slice of the arguments containing the URLs
 	urls := os.Args[1:]
 
+	// Finds the longest URL for formatting
+	urlWidth := 0
+	for _, url := range urls {
+		if len(url) > urlWidth {
+			urlWidth = len(url)
+		}
+	}
+
 	// Creates an HTTP client with a 5-second timeout.
 	client := &http.Client{Timeout: 5 * time.Second}
 
@@ -41,13 +49,14 @@ func main() {
 	close(results)
 
 	// Outputs the results.
-	printResults(results)
+	printResults(results, urlWidth)
 }
 
 type Result struct {
 	url        string
 	isLive     bool
 	statusCode int
+	status     string
 	err        error
 }
 
@@ -70,23 +79,27 @@ func checkURL(url string, client *http.Client) Result {
 	// Placed here to avoid an error if a response is not recieved.
 	defer resp.Body.Close()
 	statusCode := resp.StatusCode
+	status := resp.Status
 
 	// Returns the Result
-	return Result{url: url, isLive: true, statusCode: statusCode}
+	return Result{url: url, isLive: true, statusCode: statusCode, status: status}
 }
 
-func printResults(results chan Result) {
+func printResults(results chan Result, urlWidth int) {
 	const (
 		Up   = "\033[1;32mUP\033[0m"
 		Down = "\033[1;31mDOWN\033[0m"
 	)
 
+	// Ensures the longest URL lines up in the display.
+	urlWidth = urlWidth + 1
+
 	for result := range results {
 		if result.isLive {
-			fmt.Printf("%-20s | %s   | %d\n", result.url, Up, result.statusCode)
+			fmt.Printf("%-*s | %s   | %s\n", urlWidth, result.url, Up, result.status)
 		} else {
 			err := translateError(result.err)
-			fmt.Printf("%-20s | %s | %v\n", result.url, Down, err)
+			fmt.Printf("%-*s | %s | %v\n", urlWidth, result.url, Down, err)
 		}
 	}
 }
