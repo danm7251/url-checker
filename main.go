@@ -14,7 +14,10 @@ func main() {
 	client := &http.Client{Timeout: 5 * time.Second}
 
 	// Creates a WaitGroup to manage goroutines.
-	wg := new(sync.WaitGroup)
+	var wg sync.WaitGroup
+
+	// Creates a channel to collect Results.
+	results := make(chan Result)
 
 	// Loops through all URLs provided.
 	for _, url := range os.Args[1:] {
@@ -25,21 +28,29 @@ func main() {
 		// and decrements the WaitGroup counter when it returns.
 		go func() {
 			defer wg.Done()
-			checkURL(url, client)
+			// Sends the Result to the channel.
+			results <- checkURL(url, client)
 		}()
 	}
 
 	// Blocks until all goroutines return.
 	wg.Wait()
+
+	// Outputs the results.
+	fmt.Printf("%v", results)
+
+	// Closes the channel once we have finished using it.
+	close(results)
 }
 
-func checkURL(url string, client *http.Client) {
-	// ANSI Colour codes
-	const (
-		ColourGreen = "\033[1;92m"
-		ColourReset = "\033[0m"
-	)
+type Result struct {
+	url        string
+	isLive     bool
+	statusCode int
+	err        error
+}
 
+func checkURL(url string, client *http.Client) Result {
 	// Adds an https:// prefix if the URL has no protocol.
 	if !strings.HasPrefix(url, "http") {
 		url = "https://" + url
@@ -50,21 +61,14 @@ func checkURL(url string, client *http.Client) {
 
 	// Prints the error if we failed to recieve a response.
 	if err != nil {
-		fmt.Printf("%v: %v\n", url, err)
-		return
+		return Result{url: url, isLive: false, err: err}
 	}
 
 	// Closes the response when the function ends.
 	// Placed here to avoid an error if a response is not recieved.
 	defer resp.Body.Close()
-
-	// Prints the status code in green if it is 200
 	statusCode := resp.StatusCode
-	if statusCode == 200 {
-		fmt.Printf("%s: %s%d%s\n", url, ColourGreen, statusCode, ColourReset)
-		return
-	}
 
-	// Prints the status code.
-	fmt.Printf("%s: %d\n", url, statusCode)
+	// Returns the Result
+	return Result{url: url, isLive: true, statusCode: statusCode}
 }

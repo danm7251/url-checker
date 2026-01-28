@@ -44,3 +44,17 @@
 
 **Jan 28, 2026 - 17:15**
 > * Implemented a WaitGroup and now my URL checks are concurrent!
+
+**Jan 28, 2026 - 17:45**
+> * Discovered anonymous goroutines.
+> * Used an anonymous goroutine to move WaitGroup logic out of checkURL().
+
+**Jan 28, 2026 - 18:00**
+> * Learnt about structs.
+> * Defined a Result struct containing URL check information.
+> * Changed checkURL to return a Result and removed all printing from it.
+
+**Jan 28, 2026 - 18:15**
+> * Learnt about channels.
+> * Made a channel to collect Results from goroutines.
+> * Encountered an issue where main() never terminates.
