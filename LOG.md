@@ -74,3 +74,32 @@
 **Jan 28, 2026 - 21:00**
 > * Added rudimentary checks to shorten common error messages.
 > * Used dynamic padding to neaten the display.
+
+**Jan 29, 2026 - 12:15**
+> * Using a loop to drain the channel and block the main loop as results arrive.
+> * This removes the need for a WaitGroup.
+> * However the padding is not constant in print calls anymore.
+
+**Jan 29, 2026 - 12:30**
+> * Fixed the padding, the program was calculating the padding before it had appended "https://".
+> * Removed WaitGroup.
+> * Moved the padding calculation and sanitisation into a new function.
+> * Considered making the channel unbuffered as it now doesn't need to be buffered.
+> * Decided a buffered channel was more scalable.
+
+**Jan 29, 2026 - 13:00**
+> * Trimmed whitespace in arguments.
+> * Covered more error cases.
+
+**Jan 29, 2026 - 13:30**
+> * Learnt about the flag package.
+> * Created a usage flag, triggered by -h, --help and no arguments.
+
+**Jan 29, 2026 - 13:45**
+> * Added a request timeout flag, triggered by -t and --timeout.
+> * Created a .gitignore now that I am testing the binary.
+> * Creating a configuration struct.
+
+**Jan 29, 2026 - 14:30**
+> * Learnt about implementing methods.
+> * Used that to create a formatter for outputting results.
