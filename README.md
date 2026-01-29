@@ -1,6 +1,9 @@
 # URL Checker
 
-A tool for verifying the status of web URLs. This project is a 48-hour challenge to learn Go.
+A tool for verifying the status of web URLs concurrently. Originally started as a 48-hour challenge to learn Go.
+
+## Installation
+You can either download the compiled binary from the release page or run the tool directly if you have Go installed.
 
 ## Progress
 - [x] **Day 1:** Sequential URL checking (HTTP requests & Error handling)
