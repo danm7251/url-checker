@@ -8,22 +8,19 @@ import (
 	"time"
 )
 
-type Config struct {
+type Options struct {
 	Timeout   time.Duration
 	RawErrors bool
-	FromFile  bool
-	Args      []string
 }
 
-func LoadConfig() Config {
-	var timeout time.Duration
-	var rawErrors bool
+func Load() (Options, []string, error) {
+	var opts Options
 	var fromFile bool
 
-	flag.DurationVar(&timeout, "t", 5*time.Second, "")
-	flag.DurationVar(&timeout, "timeout", 5*time.Second, "")
-	flag.BoolVar(&rawErrors, "e", false, "")
-	flag.BoolVar(&rawErrors, "errors", false, "")
+	flag.DurationVar(&opts.Timeout, "t", 5*time.Second, "")
+	flag.DurationVar(&opts.Timeout, "timeout", 5*time.Second, "")
+	flag.BoolVar(&opts.RawErrors, "e", false, "")
+	flag.BoolVar(&opts.RawErrors, "errors", false, "")
 	flag.BoolVar(&fromFile, "f", false, "")
 	flag.BoolVar(&fromFile, "file", false, "")
 
@@ -45,31 +42,27 @@ func LoadConfig() Config {
 
 	flag.Parse()
 
-	return Config{Timeout: timeout, RawErrors: rawErrors, FromFile: fromFile, Args: flag.Args()}
-}
-
-// Assumes that the flags have already been parsed.
-func ParseArgs(config Config) ([]string, error) {
-	if config.FromFile {
-		if len(config.Args) != 1 {
+	// Parse URLs
+	if fromFile {
+		if len(flag.Args()) != 1 {
 			flag.Usage()
-			return nil, fmt.Errorf("exactly one filename must be provided")
+			return Options{}, nil, fmt.Errorf("exactly one filename must be provided")
 		}
 
-		urls, err := readURLsFromFile(config.Args[0])
+		urls, err := readURLsFromFile(flag.Arg(0))
 		if err != nil {
-			return nil, fmt.Errorf("could not read file: %s", err)
+			return Options{}, nil, fmt.Errorf("could not read file: %v", err)
 		}
 
-		return sanitiseURLs(urls), nil
+		return opts, sanitiseURLs(urls), nil
 	}
 
-	if len(config.Args) == 0 {
+	if len(flag.Args()) == 0 {
 		flag.Usage()
-		return nil, fmt.Errorf("no arguments provided")
+		return Options{}, nil, fmt.Errorf("no arguments provided")
 	}
 
-	return sanitiseURLs(config.Args), nil
+	return opts, sanitiseURLs(flag.Args()), nil
 }
 
 func readURLsFromFile(filename string) ([]string, error) {
@@ -78,7 +71,7 @@ func readURLsFromFile(filename string) ([]string, error) {
 		return nil, err
 	}
 
-	urls := strings.Split(string(bytes), " ")
+	urls := strings.Split(string(bytes), "\n")
 
 	return urls, nil
 }
@@ -87,6 +80,11 @@ func sanitiseURLs(urls []string) []string {
 	for i, url := range urls {
 		// Removes any whitespace
 		url = strings.TrimSpace(url)
+
+		// Discards empty strings
+		if url == "" {
+			continue
+		}
 
 		// Adds an https:// prefix if the URL has no protocol.
 		if !strings.HasPrefix(url, "http") {

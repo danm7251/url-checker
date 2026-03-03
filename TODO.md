@@ -10,3 +10,8 @@
 - [x] Passing files as arguments.
 - [ ] Outputting to files.
 - [ ] Create tests.
+
+## Issues
+- [ ] Limit concurrent behaviour in case of many URLs
+- [ ] Limit memory usage for large files with bufio
+- [ ] Solidify error handling (Errors in cli.go don't print)

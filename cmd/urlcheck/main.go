@@ -10,17 +10,13 @@ import (
 
 func main() {
 	// Parses the flags and creates the config.
-	config := cli.LoadConfig()
-
-	// Parses the URLs from the arguments.
-	urls, err := cli.ParseArgs(config)
-	// The only error is already handled internally.
+	opts, urls, err := cli.Load()
 	if err != nil {
 		return
 	}
 
 	// Creates an HTTP client with the desired timeout.
-	client := &http.Client{Timeout: config.Timeout}
+	client := &http.Client{Timeout: opts.Timeout}
 
 	// Creates a buffered channel to collect Results.
 	results := make(chan checker.Result, len(urls))
@@ -35,7 +31,7 @@ func main() {
 	}
 
 	// Creates a new formatter to handle output.
-	f := formatter.NewFormatter(urls, config.RawErrors)
+	f := formatter.NewFormatter(urls, opts.RawErrors)
 
 	// Takes each available result from the channel and prints them.
 	// Blocks the main loop until all URL results are taken.
