@@ -1,8 +1,10 @@
-package main
+package formatter
 
 import (
 	"fmt"
 	"strings"
+
+	"github.com/danm7251/url-checker/internal/checker"
 )
 
 // Holds formatting data.
@@ -15,26 +17,26 @@ func NewFormatter(urls []string, rawErrors bool) Formatter {
 	return Formatter{urlPadding: getMaxWidth(urls) + 1, rawErrors: rawErrors}
 }
 
-func (f Formatter) printResult(result Result) {
+func (f Formatter) PrintResult(result checker.Result) {
 	// ANSI colour coded keywords.
 	const (
 		Up   = "\033[1;32mUP\033[0m"
 		Down = "\033[1;31mDOWN\033[0m"
 	)
 
-	if result.isLive {
-		fmt.Printf("%-*s | %s   | %s\n", f.urlPadding, result.url, Up, result.status)
+	if result.IsLive {
+		fmt.Printf("%-*s | %s   | %s\n", f.urlPadding, result.Url, Up, result.Status)
 	} else {
 		var errMsg string
 
 		// Translates errors to a more compact format if feature is not disabled.
 		if f.rawErrors {
-			errMsg = result.err.Error()
+			errMsg = result.Err.Error()
 		} else {
-			errMsg = translateError(result.err)
+			errMsg = translateError(result.Err)
 		}
 
-		fmt.Printf("%-*s | %s | %v\n", f.urlPadding, result.url, Down, errMsg)
+		fmt.Printf("%-*s | %s | %v\n", f.urlPadding, result.Url, Down, errMsg)
 	}
 }
 

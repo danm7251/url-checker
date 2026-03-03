@@ -1,4 +1,4 @@
-package main
+package cli
 
 import (
 	"flag"
@@ -36,12 +36,12 @@ func LoadConfig() Config {
 		fmt.Println()
 	}
 
-	flag.Parse()
-
 	return Config{Timeout: timeout, RawErrors: rawErrors}
 }
 
+// Assumes that the flags have already been parsed.
 func ParseArgs() ([]string, error) {
+	flag.Parse()
 	args := flag.Args()
 
 	if len(args) == 0 {
