@@ -1,2 +1,3 @@
 *.exe
+/testdata
 linux-amd64-urlcheck

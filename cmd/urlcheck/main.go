@@ -13,7 +13,7 @@ func main() {
 	config := cli.LoadConfig()
 
 	// Parses the URLs from the arguments.
-	urls, err := cli.ParseArgs()
+	urls, err := cli.ParseArgs(config)
 	// The only error is already handled internally.
 	if err != nil {
 		return
@@ -35,13 +35,13 @@ func main() {
 	}
 
 	// Creates a new formatter to handle output.
-	formatter := formatter.NewFormatter(urls, config.RawErrors)
+	f := formatter.NewFormatter(urls, config.RawErrors)
 
 	// Takes each available result from the channel and prints them.
 	// Blocks the main loop until all URL results are taken.
 	for range len(urls) {
 		result := <-results
-		formatter.PrintResult(result)
+		f.PrintResult(result)
 	}
 
 	// Closes write access to the channel.
